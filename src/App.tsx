@@ -1,16 +1,18 @@
 import React from 'react';
 import './App.css';
 import Home from "./pages/home/Home";
+import Header from './components/header/Header'
+import { Container } from '@mui/material';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1> MediaStack News</h1>
+        <Header />
       </header>
-      <div id="content">
-
-      </div>
+      <Container className="App-content" sx= {{ mt: 7}}>
+        <Home />
+      </Container>
     </div>
   );
 }
