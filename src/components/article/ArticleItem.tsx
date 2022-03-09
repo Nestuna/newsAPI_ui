@@ -1,31 +1,38 @@
 // ./components/article/ArticleItem
 
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState, useContext } from "react";
 import {
   Card,
   CardMedia,
   CardContent,
   CardActions,
-  Typography,
   Button,
 } from "@mui/material";
 import newsTemplateImage from "../../assets/images/news_template.jpg";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import LaunchIcon from "@mui/icons-material/Launch";
+import Article from "../../types/article";
+import { DarkModeProvider, DarkModeContext } from "../../DarkModeProvider";
 
-const ArticleItem = (props: any) => {
+interface ArticleItemProps {
+  article: Article;
+  onRemove?: any;
+}
+
+const ArticleItem = ({ article, onRemove }: ArticleItemProps) => {
+  const darkMode = useContext(DarkModeContext);
+
   const [articleContent, setArticleContent] = useState<Record<string, string>>({
-    title: props.article.title,
-    author: props.article.author,
-    description: props.article.description,
-    imageUrl: props.article.urlToImage,
+    title: article.title,
+    author: article.author,
+    description: article.description,
+    imageUrl: article.urlToImage,
   });
   useEffect(() => {
     for (const prop in articleContent) {
       const articleCorrected = articleContent;
-      const value: string = articleContent[prop];
-      if (value === null) {
+      if (articleContent[prop] === null) {
         if (prop === "imageUrl") {
           articleCorrected[prop] = newsTemplateImage;
         } else {
@@ -38,11 +45,14 @@ const ArticleItem = (props: any) => {
 
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   useEffect(() => {
-    const favorites: string[] = JSON.parse(localStorage.getItem('favorites') || ''),
-          isInLocalStorage = favorites.includes(articleContent.title)
-    setIsFavorite(isInLocalStorage)
-  }, [articleContent.title])
-  const displayFavoriteButton = ():ReactElement => {
+    const favorites: string[] = JSON.parse(
+        localStorage.getItem("favorites") || ""
+      ),
+      isInLocalStorage = favorites.includes(articleContent.title);
+    setIsFavorite(isInLocalStorage);
+  }, [articleContent.title]);
+
+  const displayFavoriteButton = (): ReactElement => {
     if (isFavorite) {
       return (
         <Button
@@ -66,60 +76,65 @@ const ArticleItem = (props: any) => {
     );
   };
 
-  const addToLocalFavorites = ():void => {
-    setIsFavorite(true)
-    update_localStorage(false)
-  }
+  const addToLocalFavorites = (): void => {
+    setIsFavorite(true);
+    update_localStorage(false);
+  };
 
-  const removeFromLocalFavorites = ():void => {
-    setIsFavorite(false)
-    update_localStorage(true)
-  }
+  const removeFromLocalFavorites = (): void => {
+    setIsFavorite(false);
+    update_localStorage(true);
+    emitRemoveEventToParent();
+  };
 
-  const update_localStorage = (remove:boolean):void => {
-    const favoritesStr: string = localStorage.getItem('favorites') || ''
-    let favorites: string[] = []
-    if (favoritesStr) favorites = JSON.parse(favoritesStr)
+  const update_localStorage = (remove: boolean): void => {
+    const favoritesStr: string = localStorage.getItem("favorites") || "";
+    let favorites: string[] = [];
+    if (favoritesStr) favorites = JSON.parse(favoritesStr);
 
-    let newFavorites: string[]
+    let newFavorites: string[];
     if (remove) {
-      newFavorites = favorites.filter((item) => item !== articleContent.title )
-      console.log(newFavorites);
-
+      newFavorites = favorites.filter((item) => item !== articleContent.title);
     } else {
-      newFavorites = [articleContent.title, ...favorites]
+      newFavorites = [articleContent.title, ...favorites];
     }
-    localStorage.setItem('favorites', JSON.stringify(newFavorites))
-  }
+    localStorage.setItem("favorites", JSON.stringify(newFavorites));
+  };
+
+  const emitRemoveEventToParent = () => {
+    onRemove(articleContent.title);
+  };
 
   return (
-    <Card sx={{ flexGrow: 3, maxWidth: 350, m: 1 }}>
-      <CardMedia
-        component="img"
-        height="140"
-        image={articleContent.imageUrl}
-        alt="article image"
-      />
-      <CardContent>
-        <Typography component="h2" sx={{ fontWeight: "bold" }}>
-          {articleContent.title}
-        </Typography>
-        <Typography component="h3" sx={{ fontStyle: "italic " }}>
-          {articleContent.author}
-        </Typography>
-        <Typography component="p">{articleContent.description}</Typography>
-      </CardContent>
-      <CardActions>
-        <Button
-          size="small"
-          href={props.article.url}
-          startIcon={<LaunchIcon />}
-        >
-          Go to article
-        </Button>
-        {displayFavoriteButton()}
-      </CardActions>
-    </Card>
+    <DarkModeProvider>
+      <Card
+        className={darkMode ? "card-container-dark" : "card-container-light"}
+        sx={{ flexGrow: 3, maxWidth: 350, m: 1, backgroundColor: 'dark' }}
+      >
+        <CardMedia
+          component="img"
+          height="200"
+          image={articleContent.imageUrl}
+          alt="article image"
+        />
+        <CardContent>
+          <h2>
+            {articleContent.title}
+          </h2>
+          <h3>
+            {articleContent.author}
+          </h3>
+          <p>{articleContent.description}</p>
+        </CardContent>
+        <CardActions>
+          <Button size="small" href={article.url} startIcon={<LaunchIcon />}>
+            Go to article
+          </Button>
+          {displayFavoriteButton()}
+        </CardActions>
+      </Card>
+    </DarkModeProvider>
+
   );
 };
 

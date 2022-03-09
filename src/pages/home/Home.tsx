@@ -3,21 +3,19 @@
 import React, { ReactElement, useEffect, useState } from "react";
 import { Box } from "@mui/material";
 
-import { getAllNews } from "../../api/MediaStackAPI";
+import { getAllNews } from "../../api/NewsAPI";
 import sample from "../../helpers/api_sample.json";
 import ArticleItem from '../../components/article/ArticleItem'
 
 const Home = (): ReactElement => {
   const [news, setNews] = useState<any[]>([]);
   useEffect(() => {
-    // const fetchNews = async () => {
-    //   const result = await getAllNews()
-    //   setNews(result.articles)
+    const fetchNews = async () => {
+      const result = await getAllNews()
+      setNews(result.articles)
 
-    // }
-    // fetchNews()
-
-    setNews(sample);
+    }
+    fetchNews()
   }, []);
 
   return (
@@ -29,7 +27,7 @@ const Home = (): ReactElement => {
       }}
     >
       {news.map((article) => (
-        <ArticleItem article={ article } />
+        <ArticleItem key={ article.title } article={ article } />
       ))}
     </Box>
   );

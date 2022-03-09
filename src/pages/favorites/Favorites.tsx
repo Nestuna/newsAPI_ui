@@ -1,40 +1,55 @@
 // ./pages/favorites/Favorites
 
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Box } from "@mui/material";
-import { getAllNews } from "../../api/MediaStackAPI";
+import { searchArticle } from "../../api/NewsAPI";
 import sample from "../../helpers/api_sample.json";
-import ArticleItem from '../../components/article/ArticleItem'
+import ArticleItem from "../../components/article/ArticleItem";
+import { TitleSharp } from "@mui/icons-material";
 
 const Favorites = () => {
-    const [favorites, setFavorites] = useState<any[]>([]);
-    useEffect(() => {
-        const favoritesInLocalStorage: string[] = JSON.parse(localStorage.getItem('favorites') || '[]')
-        const favorites = sample.filter((element => favoritesInLocalStorage.includes(element.title)))
-      // const fetchNews = async () => {
-      //   const result = await getAllNews()
-      //   setFavorites(result.articles)
+  const [favorites, setFavorites] = useState<any[]>([]);
+  useEffect(() => {
+    const favoritesInLocalStorage: string[] = JSON.parse(
+      localStorage.getItem("favorites") || "[]"
+    );
+    let favorites: any[];
+    const searchNews = async () => {
+      for(const title of favoritesInLocalStorage) {
+        const result = await searchArticle(title)
+        favorites.push(result)
+      }
+      setFavorites(favorites)
+    }
+    searchNews()
 
-      // }
-      // fetchNews()
+  }, []);
 
-      setFavorites(favorites);
-    }, []);
+  const handleRemove = (articleTitle: string) => {
+    const newFavorites = favorites.filter(
+      (element) => element.title !== articleTitle
+    );
+    setFavorites(newFavorites);
+  };
 
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "center",
-        }}
-      >
-        {favorites.map((article) => (
-          <ArticleItem article={ article } />
-        ))}
-      </Box>
-    )
-}
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexWrap: "wrap",
+        justifyContent: "center",
+      }}
+    >
+      {favorites.map((article) => (
+        <ArticleItem
+          key={article.title}
+          article={article}
+          onRemove={handleRemove}
+        />
+      ))}
+    </Box>
+  );
+};
 
-export default Favorites
+export default Favorites;
