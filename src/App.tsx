@@ -1,8 +1,11 @@
 import React from 'react';
 import './App.css';
+import { Box} from '@mui/material';
+import { Routes, Route, BrowserRouter as Router} from 'react-router-dom';
+
 import Home from "./pages/home/Home";
 import Header from './components/header/Header'
-import { Container } from '@mui/material';
+import Favorites from './pages/favorites/Favorites'
 
 function App() {
   return (
@@ -10,9 +13,13 @@ function App() {
       <header className="App-header">
         <Header />
       </header>
-      <Container className="App-content" sx= {{ mt: 7}}>
-        <Home />
-      </Container>
+      <Box className="App-content" sx= {{ mt: 7}}>
+        <Routes>
+          <Route path="/" element={ <Home />} />
+          <Route path="/home" element={ <Home />} />
+          <Route path ="/favorites" element={ <Favorites />} />
+        </Routes>
+      </Box>
     </div>
   );
 }
