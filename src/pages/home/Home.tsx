@@ -13,9 +13,17 @@ const Home = (): ReactElement => {
     const fetchNews = async () => {
       const result = await getAllNews()
       setNews(result.articles)
-
     }
-    fetchNews()
+    //  les requêtes ne marche par sur Netlmify (erreur 426),
+    // car pour l'utilisation gratuite,
+    // des requêtes peuvent seulement être émises depuis localhost
+    // Décommenter la ligne qui suit si tu es sur localhost, pour avoir les dernières news
+    // fetchNews()
+
+    // j'utilise un helper json à la place pour avoir au moins un affichage sur Netlify
+    // Comment la ligne qui suit si tu requêtes l'API
+    setNews(sample)
+
   }, []);
 
   return (
