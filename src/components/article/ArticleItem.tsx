@@ -45,11 +45,13 @@ const ArticleItem = ({ article, onRemove }: ArticleItemProps) => {
 
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   useEffect(() => {
-    const favorites: string[] = JSON.parse(
-        localStorage.getItem("favorites") || ""
-      ),
-      isInLocalStorage = favorites.includes(articleContent.title);
-    setIsFavorite(isInLocalStorage);
+    const favoritesStrResponse = localStorage.getItem("favorites")
+    if (favoritesStrResponse) {
+      const favorites: string[] = JSON.parse(favoritesStrResponse)
+      const isInLocalStorage = favorites.includes(articleContent.title);
+      setIsFavorite(isInLocalStorage);
+    }
+
   }, [articleContent.title]);
 
   const displayFavoriteButton = (): ReactElement => {
